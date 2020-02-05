@@ -15,3 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('product/{id}/{name}', 'ProductController@show')->where(['id' => '[0-9]+', 'name' => '[a-z]+']);
+
+
+Route::get('back-office', 'BackOfficeController@show')
+	->name('backoffice.show');
+Route::post('back-office/create_brand', 'BackOfficeController@create_brand')
+	->name('backoffice.create_brand');;
