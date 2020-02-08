@@ -68,6 +68,7 @@ class BackOfficeController extends Controller {
 		// TODO: handle auth
 		$o = $this->validate($request, [
 			'label' => ['required', 'max:255'],
+			'description' => ['required', 'max:600'],
 			'price' => ['required', 'integer'],
 			'brand_id' => [Rule::exists('brand','id'),]
 		]);
@@ -86,7 +87,7 @@ class BackOfficeController extends Controller {
 			}
 			
 			$filename = $this->_getUniqLocation($file->extension());
-			$file->storeAs('images', $filename);
+			$file->storeAs('public/image', $filename);
 			
 			$image = Image::create( ['location' => $filename] );
 			$image->save();
@@ -97,17 +98,28 @@ class BackOfficeController extends Controller {
 		//_____________________________
 		// Create product
 		
-		$product = Product::create( $request->only(['label','price','brand_id']) );
+		$product = Product::create( $request->only(['label','description','price','brand_id']) );
 		$product->imageAr()->saveMany( $imageAr );
 		$product->save();
 		
 		return redirect(route('backoffice.show'));
 	}
 	
+	public function edit_product( Request $request, $id ) {
+		
+		$product = Product::findOrFail($id);
+		$brandAr = Brand::all();
+		
+		return view('backoffice_edit_product', [
+			'product' => $product,
+			'brandAr' => $brandAr,
+		]);
+	}
+	
 	public function update_product( Request $request, $id ) {
 		// TODO: handle auth
 		$o = $this->validate($request, [
-			'label' => ['required', 'max:255'],
+			'label' => ['required', 'max:255',],
 		]);
 		
 		$brand = Product::findOrFail($id);
@@ -116,30 +128,82 @@ class BackOfficeController extends Controller {
 		
 		return redirect(route('backoffice.show'));
 	}
-
-//___________________________________________________________
-
-    public function create_image( Request $request ) {
+	
+	public function delete_product( Request $request, $id ) {
 		// TODO: handle auth
 		$o = $this->validate($request, [
-			'label' => ['required', 'max:255'],
+			'id' => ['required', 'integer',Rule::exists('product','id'),],
 		]);
 		
-		$file = $request->file('image');
-		var_dump( $file );
-		exit;
-		
-		$filename = $this->_getUniqLocation($file->extension());
-		$file->storeAs('images', $filename);
-		$brand = Image::create( ['location' => $filename] );
-		$brand->save();
+		$product = Product::findOrFail($request->input('id'));
+		//TODO : delete all image
+		$product->delete();
 		
 		return redirect(route('backoffice.show'));
 	}
 	
+//___________________________________________________________
+
+
+    public function create_product_image( Request $request ) {
+		// TODO: handle auth
+		$o = $this->validate( $request, [
+			'product_id' => ['required', 'integer',],
+		] );
+		
+		//_____________________________
+		// Create image
+		$fileAr = $request->file('image');
+		
+		//TODO: check fileAr is an array
+		// TODO: merge with create product
+		$imageAr = [];
+		foreach( $fileAr as $file ) {
+			if( !$file->isValid() ) {
+				//TODO : retrn bad request & error message
+				return redirect(route('backoffice.show'));
+			}
+			
+			$filename = $this->_getUniqLocation($file->extension());
+			$file->storeAs('public/image', $filename);
+			
+			$image = Image::create( ['location' => $filename] );
+			$image->save();
+			
+			$imageAr[] = $image;
+		}
+		
+		//_____________________________
+		// Create product
+		
+		$product = Product::create( $request->only(['label','description','price','brand_id']) );
+		$product->imageAr()->saveMany( $imageAr );
+		$product->save();
+		
+		return redirect(route('backoffice.show'));
+	}
+
+
+	public function delete_product_image( Request $request ) {
+		// TODO: handle auth
+		$o = $this->validate( $request, [
+			'product_id' => ['required', 'integer',],
+			'image_id' => ['required', 'integer', Rule::exists('image','id'),],
+		] );
+		
+		$product = Product::findOrFail($request->input('product_id'));
+		$product->imageAr()->detach($request->input('image_id'));
+		Image::destroy($request->input('image_id'));
+		// TODO : remove file from disk
+		
+		return redirect(route('backoffice.show'));
+	}
+
+//___________________________________________________________
+
 	function _getUniqLocation( $ext ) {
 		do {
-			$file_name = md5(time()) . $ext;
+			$file_name = md5(time()) . '.' . $ext;
 			$image = Image::where('location', $file_name)->get();
 		} while(!$image->isEmpty());
 		return $file_name;

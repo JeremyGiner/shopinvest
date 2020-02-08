@@ -61,10 +61,26 @@
 		@foreach ($productAr as $product)
 		<tr>
 			<td>{{ $product->label }}</td>
+			<td>
+				<a class="btn btn-success" href="{{ route( 'backoffice.edit_product', [ 'id' => $product->id ] ) }}">
+					Edit
+				</a>
+			</td>
+			<td>
+				<a class="btn btn-primary" href="{{ route( 'product.show', [ 'id' => $product->id, 'name' => $product->getSlug() ] ) }}">
+					View page
+				</a>
+			</td>
+			<td>
+				<form action="{{ route('backoffice.delete_product') }}" method="POST">
+				{{ csrf_field() }}
+				<input type="hidden" name="id" value="{{ $product->id }}" />
+				<button class="btn btn-danger" type="submit">Delete</button>
+				</form>
+			</td>
 		</tr>
 		@endforeach
 	</table>
-	
 	
 	<h2>Create Product</h2>
 	<form id="form_create_product" 
@@ -76,6 +92,10 @@
 		<div class="form-group">
 			<label>Name</label>
 			<input type="text" name="label" placeholder="Name" />
+		</div>
+		<div class="form-group">
+			<label>Description</label>
+			<textarea name="description"></textarea>
 		</div>
 		<div class="form-group">
 			<label>Price(in cent)</label>
