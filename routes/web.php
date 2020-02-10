@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('backoffice.show');
 });
 Route::get('product/{id}/{name}', 'ProductController@show')
 	->where(['id' => '[0-9]+', 'name' => '.*'])
