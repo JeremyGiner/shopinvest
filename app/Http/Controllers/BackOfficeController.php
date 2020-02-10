@@ -129,7 +129,7 @@ class BackOfficeController extends Controller {
 		return redirect(route('backoffice.show'));
 	}
 	
-	public function delete_product( Request $request, $id ) {
+	public function delete_product( Request $request ) {
 		// TODO: handle auth
 		$o = $this->validate($request, [
 			'id' => ['required', 'integer',Rule::exists('product','id'),],
@@ -137,6 +137,7 @@ class BackOfficeController extends Controller {
 		
 		$product = Product::findOrFail($request->input('id'));
 		//TODO : delete all image
+		$product->imageAr()->delete();
 		$product->delete();
 		
 		return redirect(route('backoffice.show'));

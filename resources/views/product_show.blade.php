@@ -98,17 +98,29 @@
 		</nav>
 		<section class="container">
 			<div class="row no-gutters">
-			<div class="col-6">
-				@foreach ( $product->imageAr as $image )
-					<img class="shopinvest-block d-block" src="{{ $image->location }}" />
-				@endforeach
-				<div class="row">
-				@foreach ( $product->imageAr as $image )
-					<div class="col-3">
-						<img src="{{ asset('storage/image/'.$image->location) }}" style="width:2em; max-height:2em" />
-					</div>
+			<div class="col-6 ">
+				<div class="tab-content">
+				@foreach ( $product->imageAr as $index => $image )
+					<img id="image-{{ $index }}" 
+						class="shopinvest-block tab-pane @if ($loop->first) active @endif" 
+						src="{{ asset('storage/image/'.$image->location) }}"
+						role="tabpanel"
+						style="max-width: 100%;"
+					/>
 				@endforeach
 				</div>
+				<ul class="row nav" role="tablist">
+					@foreach ( $product->imageAr as $index => $image )
+					<li>
+						<a class="nav-link @if ($loop->first) active @endif"
+							data-toggle="tab" href="#image-{{ $index }}" 
+							role="tab"
+						>
+							<img src="{{ asset('storage/image/'.$image->location) }}" style="width:2em; max-height:2em" />
+						</a>
+					</li>
+					@endforeach
+				</ul>
 			</div>
 			<div class="col-6">
 				
@@ -121,20 +133,39 @@
 					
 				</div>
 				<div class="shopinvest-block mb-3 px-3">
-					<div class="row align-items-stretch center">
-						<a href="/" class="shopinvest-block col d-flex align-items-center">
-							<span class="">Description</span>
-						</a>
-						<a href="/" class="shopinvest-block col d-flex align-items-center">
-							Livraison
-						</a>
-						<a href="/" class="shopinvest-block col d-flex align-items-center">
-							Garanties&nbsp;&amp; Paiement
-						</a>
-						<span class="col">
-					</div>
-					<div class="center py-3">
-						Texte
+					<ul class="nav row align-items-stretch center"  id="myTab" role="tablist">
+						<li class="col align-items-center shopinvest-block">
+							<a class="nav-link active"
+								 data-toggle="tab" href="#product-description" role="tab"
+							>
+								<span class="">Description</span>
+							</a>
+						</li>
+						<li class="col shopinvest-block">
+							<a class="nav-link"
+								 data-toggle="tab" href="#product-livraison" role="tab"
+							>
+								Livraison
+							</a>
+						</li>
+						<li class="col shopinvest-block">
+							<a class="nav-link"
+								 data-toggle="tab" href="#product-garanties"role="tab"
+							>
+								Garanties&nbsp;&amp; Paiement
+							</a>
+						</li>
+					</ul>
+					<div class="center py-3 tab-content">
+						<div id="product-description" class="tab-pane active" role="tabpanel">
+							{{ $product->description }}
+						</div>
+						<div id="product-livraison" class="tab-pane" role="tabpanel">
+							livraison
+						</div>
+						<div id="product-garanties" class="tab-pane" role="tabpanel">
+							garanties
+						</div>
 					</div>
 				</div>
 				

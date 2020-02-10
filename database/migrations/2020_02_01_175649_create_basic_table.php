@@ -24,6 +24,7 @@ class CreateBasicTable extends Migration
         Schema::create('product', function (Blueprint $table) {
             $table->increments('id');
             $table->string('label',200);
+            $table->text('description');
             $table->unsignedInteger('price');
 			$table->index('price');
 			
@@ -37,7 +38,7 @@ class CreateBasicTable extends Migration
 			$table->unsignedInteger('product_id');
             $table->foreign('product_id')->references('id')->on('product');
 			$table->unsignedInteger('image_id');
-            $table->foreign('image_id')->references('id')->on('image');
+            $table->foreign('image_id')->references('id')->on('image')->onDelete('cascade');
         });
         
     }

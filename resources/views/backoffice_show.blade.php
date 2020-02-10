@@ -22,6 +22,16 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 	<h2>List of Brand</h2>
 	<table class="table">
 		<tbody>
@@ -33,17 +43,6 @@
 	</table>
 	
 	<h2>Create Post</h2>
-
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-	
 	<form action="{{ route('backoffice.create_brand') }}" method="POST">
 		{{ csrf_field() }}
 		<div class="form-group">
@@ -72,7 +71,7 @@
 				</a>
 			</td>
 			<td>
-				<form action="{{ route('backoffice.delete_product') }}" method="POST">
+				<form action="{{ route('backoffice.delete_product') }}" method="POST" onsubmit="return confirm('Are you sure?');">
 				{{ csrf_field() }}
 				<input type="hidden" name="id" value="{{ $product->id }}" />
 				<button class="btn btn-danger" type="submit">Delete</button>
